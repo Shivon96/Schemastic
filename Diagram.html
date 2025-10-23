@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElectroSearch - Schematic Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-section {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .device-type {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .device-btn {
+            padding: 12px 25px;
+            border: 2px solid #3498db;
+            background: white;
+            color: #3498db;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .device-btn.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .results-section {
+            padding: 40px;
+            display: none;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 1px solid #e1e5e9;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .result-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .result-card p {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .download-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease;
+            width: 100%;
+        }
+
+        .download-btn:hover {
+            background: #2980b9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .disclaimer {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+            color: #856404;
+        }
+
+        .website-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .website-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                min-width: auto;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 ElectroSearch</h1>
+            <p>Find Schematics for Laptops, Phones, TVs & Audio Equipment</p>
+        </div>
+
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" class="search-input" id="modelInput" 
+                       placeholder="Enter device model (e.g., Dell E7440, iPhone 12, Samsung UN55...)">
+                <button class="search-btn" onclick="searchSchematics()">
+                    Search Schematics
+                </button>
+            </div>
+
+            <div class="device-type">
+                <button class="device-btn active" onclick="setDeviceType('laptop')">💻 Laptop</button>
+                <button class="device-btn" onclick="setDeviceType('phone')">📱 Mobile Phone</button>
+                <button class="device-btn" onclick="setDeviceType('tv')">📺 LED TV</button>
+                <button class="device-btn" onclick="setDeviceType('audio')">🔊 Audio Equipment</button>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Searching our database and trusted sources...</p>
+        </div>
+
+        <div class="results-section" id="resultsSection">
+            <h2>Search Results</h2>
+            <div class="results-grid" id="resultsGrid">
+                <!-- Results will be inserted here by JavaScript -->
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            <h3>⚠️ Important Notice</h3>
+            <p>This tool searches publicly available sources for technical documentation. Schematics for modern devices are often protected intellectual property. Always ensure you have the right to access and use these documents for legitimate repair purposes.</p>
+        </div>
+    </div>
+
+    <script>
+        let currentDeviceType = 'laptop';
+        const websites = {
+            laptop: [
+                { name: "Badcaps Forum", url: "https://www.badcaps.net/forum", search: "site:badcaps.net" },
+                { name: "ElectroTech", url: "https://www.electrotech.com/", search: "site:electrotech.com" },
+                { name: "GitHub Repositories", url: "https://github.com/", search: "site:github.com" }
+            ],
+            phone: [
+                { name: "GSMArena (Info)", url: "https://www.gsmarena.com/", search: "site:gsmarena.com" },
+                { name: "Zalewski X-Ray", url: "https://zalewski.org/", search: "site:zalewski.org" },
+                { name: "Forum GSMHosting", url: "https://forum.gsmhosting.com/", search: "site:forum.gsmhosting.com" }
+            ],
+            tv: [
+                { name: "ElektroTanya", url: "https://elektrotanya.com/", search: "site:elektrotanya.com" },
+                { name: "ManualLib", url: "https://www.manuallib.com/", search: "site:manuallib.com" }
+            ],
+            audio: [
+                { name: "ElektroTanya", url: "https://elektrotanya.com/", search: "site:elektrotanya.com" },
+                { name: "HiFi Engine", url: "https://www.hifiengine.com/", search: "site:hifiengine.com" }
+            ]
+        };
+
+        function setDeviceType(type) {
+            currentDeviceType = type;
+            
+            // Update active button
+            document.querySelectorAll('.device-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function searchSchematics() {
+            const model = document.getElementById('modelInput').value.trim();
+            
+            if (!model) {
+                alert('Please enter a device model number');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultsSection').style.display = 'none';
+
+            // Simulate search delay
+            setTimeout(() => {
+                displayResults(model);
+            }, 1500);
+        }
+
+        function displayResults(model) {
+            const resultsGrid = document.getElementById('resultsGrid');
+            const resultsSection = document.getElementById('resultsSection');
+            
+            // Hide loading
+            document.getElementById('loading').style.display = 'none';
+            
+            // Clear previous results
+            resultsGrid.innerHTML = '';
+
+            const sources = websites[currentDeviceType];
+            
+            sources.forEach(source => {
+                const searchUrl = `https://www.google.com/search?q=${source.search}+"${encodeURIComponent(model)}"+schematic`;
+                
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <h3>${source.name}</h3>
+                    <p>Search for <strong>${model}</strong> schematics on ${source.name}</p>
+                    <a href="${searchUrl}" target="_blank" class="download-btn">
+                        Search on ${source.name}
+                    </a>
+                `;
+                resultsGrid.appendChild(card);
+            });
+
+            // Add manual search card
+            const manualCard = document.createElement('div');
+            manualCard.className = 'result-card';
+            manualCard.innerHTML = `
+                <h3>🔍 Manual Search</h3>
+                <p>Try these search queries in your favorite search engine:</p>
+                <div style="margin: 15px 0;">
+                    <code style="background: #f8f9fa; padding: 5px 10px; border-radius: 4px; display: block; margin: 5px 0;">"${model}" schematic pdf</code>
+                    <
