@@ -39,11 +39,6 @@
             margin-bottom: 10px;
         }
 
-        .header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-
         .search-section {
             padding: 40px;
             background: #f8f9fa;
@@ -63,13 +58,16 @@
             border: 2px solid #e1e5e9;
             border-radius: 10px;
             font-size: 16px;
-            transition: all 0.3s ease;
         }
 
-        .search-input:focus {
-            outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        .search-btn {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
         }
 
         .device-type {
@@ -86,8 +84,6 @@
             color: #3498db;
             border-radius: 25px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
         }
 
         .device-btn.active {
@@ -95,25 +91,8 @@
             color: white;
         }
 
-        .search-btn {
-            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .search-btn:hover {
-            transform: translateY(-2px);
-        }
-
         .results-section {
             padding: 40px;
-            display: none;
         }
 
         .results-grid {
@@ -129,24 +108,16 @@
             padding: 25px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
             border: 1px solid #e1e5e9;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .result-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
         }
 
         .result-card h3 {
             color: #2c3e50;
             margin-bottom: 15px;
-            font-size: 1.3em;
         }
 
         .result-card p {
             color: #7f8c8d;
             margin-bottom: 20px;
-            line-height: 1.6;
         }
 
         .download-btn {
@@ -156,34 +127,9 @@
             padding: 10px 20px;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: 600;
-            transition: background 0.3s ease;
-            width: 100%;
-        }
-
-        .download-btn:hover {
-            background: #2980b9;
-        }
-
-        .loading {
+            text-decoration: none;
+            display: inline-block;
             text-align: center;
-            padding: 40px;
-            display: none;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         .disclaimer {
@@ -195,32 +141,10 @@
             color: #856404;
         }
 
-        .website-link {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .website-link:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 768px) {
-            .search-box {
-                flex-direction: column;
-            }
-            
-            .search-input {
-                min-width: auto;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            .results-grid {
-                grid-template-columns: 1fr;
-            }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
         }
     </style>
 </head>
@@ -234,7 +158,7 @@
         <div class="search-section">
             <div class="search-box">
                 <input type="text" class="search-input" id="modelInput" 
-                       placeholder="Enter device model (e.g., Dell E7440, iPhone 12, Samsung UN55...)">
+                       placeholder="Enter device model (e.g., Dell E7440, iPhone 12, UN55KU6300, JBL PartyBox 310)">
                 <button class="search-btn" onclick="searchSchematics()">
                     Search Schematics
                 </button>
@@ -242,52 +166,123 @@
 
             <div class="device-type">
                 <button class="device-btn active" onclick="setDeviceType('laptop')">💻 Laptop</button>
-                <button class="device-btn" onclick="setDeviceType('phone')">📱 Mobile Phone</button>
-                <button class="device-btn" onclick="setDeviceType('tv')">📺 LED TV</button>
-                <button class="device-btn" onclick="setDeviceType('audio')">🔊 Audio Equipment</button>
+                <button class="device-btn" onclick="setDeviceType('phone')">📱 Phone</button>
+                <button class="device-btn" onclick="setDeviceType('tv')">📺 TV</button>
+                <button class="device-btn" onclick="setDeviceType('audio')">🔊 Audio</button>
             </div>
         </div>
 
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <p>Searching our database and trusted sources...</p>
-        </div>
-
         <div class="results-section" id="resultsSection">
-            <h2>Search Results</h2>
+            <h2>Recommended Sources</h2>
             <div class="results-grid" id="resultsGrid">
-                <!-- Results will be inserted here by JavaScript -->
+                <!-- Results will be populated by JavaScript -->
             </div>
         </div>
 
         <div class="disclaimer">
             <h3>⚠️ Important Notice</h3>
-            <p>This tool searches publicly available sources for technical documentation. Schematics for modern devices are often protected intellectual property. Always ensure you have the right to access and use these documents for legitimate repair purposes.</p>
+            <p>This tool helps you find schematic sources. Always verify files for viruses and ensure you have rights to use documents for legitimate repair purposes.</p>
         </div>
     </div>
 
     <script>
-        let currentDeviceType = 'laptop';
-        const websites = {
+        // Database of schematic sources
+        const schematicSources = {
             laptop: [
-                { name: "Badcaps Forum", url: "https://www.badcaps.net/forum", search: "site:badcaps.net" },
-                { name: "ElectroTech", url: "https://www.electrotech.com/", search: "site:electrotech.com" },
-                { name: "GitHub Repositories", url: "https://github.com/", search: "site:github.com" }
+                {
+                    name: "Badcaps Forum",
+                    description: "Best for laptop motherboard schematics and boardviews",
+                    url: "https://www.badcaps.net/forum",
+                    searchQuery: "site:badcaps.net",
+                    example: "Dell E7440, HP Pavilion 15, Lenovo ThinkPad"
+                },
+                {
+                    name: "ElectroTech Forum",
+                    description: "Large community with schematics and repair guides",
+                    url: "https://www.electrotech.com/",
+                    searchQuery: "site:electrotech.com",
+                    example: "Laptop power supply schematics"
+                },
+                {
+                    name: "GitHub Collections",
+                    description: "Open source schematic repositories",
+                    url: "https://github.com",
+                    searchQuery: "site:github.com laptop schematic",
+                    example: "LA-F611P, MB 16Z707"
+                }
             ],
             phone: [
-                { name: "GSMArena (Info)", url: "https://www.gsmarena.com/", search: "site:gsmarena.com" },
-                { name: "Zalewski X-Ray", url: "https://zalewski.org/", search: "site:zalewski.org" },
-                { name: "Forum GSMHosting", url: "https://forum.gsmhosting.com/", search: "site:forum.gsmhosting.com" }
+                {
+                    name: "GSMArena (Device Info)",
+                    description: "Get exact model numbers and specifications",
+                    url: "https://www.gsmarena.com/",
+                    searchQuery: "site:gsmarena.com",
+                    example: "iPhone 12, Samsung Galaxy S21"
+                },
+                {
+                    name: "Zalewski X-Ray",
+                    description: "High-resolution PCB and component images",
+                    url: "https://zalewski.org/",
+                    searchQuery: "site:zalewski.org",
+                    example: "Phone boardview and layout"
+                },
+                {
+                    name: "PhoneBoard PCB",
+                    description: "PCB layouts and component identification",
+                    url: "https://phoneboard.pl/",
+                    searchQuery: "site:phoneboard.pl",
+                    example: "Mobile phone PCB diagrams"
+                }
             ],
             tv: [
-                { name: "ElektroTanya", url: "https://elektrotanya.com/", search: "site:elektrotanya.com" },
-                { name: "ManualLib", url: "https://www.manuallib.com/", search: "site:manuallib.com" }
+                {
+                    name: "ElektroTanya",
+                    description: "Service manuals and TV schematics",
+                    url: "https://elektrotanya.com/",
+                    searchQuery: "site:elektrotanya.com",
+                    example: "Samsung UN55KU6300, LG 55UK6300"
+                },
+                {
+                    name: "ManualLib",
+                    description: "Service manuals and user guides",
+                    url: "https://www.manuallib.com/",
+                    searchQuery: "site:manuallib.com",
+                    example: "TV service manual PDF"
+                },
+                {
+                    name: "TV Repair Forum",
+                    description: "Community for TV repair technicians",
+                    url: "https://www.badcaps.net/forum",
+                    searchQuery: "site:badcaps.net TV schematic",
+                    example: "LED TV power supply repair"
+                }
             ],
             audio: [
-                { name: "ElektroTanya", url: "https://elektrotanya.com/", search: "site:elektrotanya.com" },
-                { name: "HiFi Engine", url: "https://www.hifiengine.com/", search: "site:hifiengine.com" }
+                {
+                    name: "ElektroTanya",
+                    description: "Audio equipment service manuals",
+                    url: "https://elektrotanya.com/",
+                    searchQuery: "site:elektrotanya.com",
+                    example: "JBL PartyBox, Sony amplifier"
+                },
+                {
+                    name: "HiFi Engine",
+                    description: "Vintage and modern audio schematics",
+                    url: "https://www.hifiengine.com/",
+                    searchQuery: "site:hifiengine.com",
+                    example: "Audio amplifier schematics"
+                },
+                {
+                    name: "AudioKarma",
+                    description: "Audio repair community",
+                    url: "https://audiokarma.org/",
+                    searchQuery: "site:audiokarma.org",
+                    example: "JBL speaker repair"
+                }
             ]
         };
+
+        let currentDeviceType = 'laptop';
 
         function setDeviceType(type) {
             currentDeviceType = type;
@@ -297,59 +292,94 @@
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
+            
+            // Show sources for selected device type
+            displayDefaultSources();
+        }
+
+        function displayDefaultSources() {
+            const resultsGrid = document.getElementById('resultsGrid');
+            const sources = schematicSources[currentDeviceType];
+            
+            resultsGrid.innerHTML = '';
+            
+            sources.forEach(source => {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <h3>${source.name}</h3>
+                    <p>${source.description}</p>
+                    <p><strong>Example search:</strong> ${source.example}</p>
+                    <a href="${source.url}" target="_blank" class="download-btn">
+                        Visit ${source.name}
+                    </a>
+                `;
+                resultsGrid.appendChild(card);
+            });
         }
 
         function searchSchematics() {
             const model = document.getElementById('modelInput').value.trim();
+            const resultsGrid = document.getElementById('resultsGrid');
             
             if (!model) {
-                alert('Please enter a device model number');
+                displayDefaultSources();
                 return;
             }
 
-            // Show loading
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('resultsSection').style.display = 'none';
-
-            // Simulate search delay
-            setTimeout(() => {
-                displayResults(model);
-            }, 1500);
-        }
-
-        function displayResults(model) {
-            const resultsGrid = document.getElementById('resultsGrid');
-            const resultsSection = document.getElementById('resultsSection');
-            
-            // Hide loading
-            document.getElementById('loading').style.display = 'none';
-            
-            // Clear previous results
+            const sources = schematicSources[currentDeviceType];
             resultsGrid.innerHTML = '';
-
-            const sources = websites[currentDeviceType];
             
             sources.forEach(source => {
-                const searchUrl = `https://www.google.com/search?q=${source.search}+"${encodeURIComponent(model)}"+schematic`;
+                const searchUrl = `https://www.google.com/search?q=${source.searchQuery}+"${encodeURIComponent(model)}"+schematic+service+manual`;
                 
                 const card = document.createElement('div');
                 card.className = 'result-card';
                 card.innerHTML = `
                     <h3>${source.name}</h3>
-                    <p>Search for <strong>${model}</strong> schematics on ${source.name}</p>
+                    <p>${source.description}</p>
+                    <p><strong>Searching for:</strong> ${model}</p>
                     <a href="${searchUrl}" target="_blank" class="download-btn">
-                        Search on ${source.name}
+                        Search ${source.name} for "${model}"
                     </a>
                 `;
                 resultsGrid.appendChild(card);
             });
 
-            // Add manual search card
-            const manualCard = document.createElement('div');
-            manualCard.className = 'result-card';
-            manualCard.innerHTML = `
-                <h3>🔍 Manual Search</h3>
-                <p>Try these search queries in your favorite search engine:</p>
-                <div style="margin: 15px 0;">
-                    <code style="background: #f8f9fa; padding: 5px 10px; border-radius: 4px; display: block; margin: 5px 0;">"${model}" schematic pdf</code>
-                    <
+            // Add manual search tips
+            const tipsCard = document.createElement('div');
+            tipsCard.className = 'result-card';
+            tipsCard.innerHTML = `
+                <h3>💡 Search Tips</h3>
+                <p><strong>Try these search terms:</strong></p>
+                <p>"${model} schematic pdf"</p>
+                <p>"${model} service manual"</p>
+                <p>"${model} boardview"</p>
+                <p>"${model} repair guide"</p>
+            `;
+            resultsGrid.appendChild(tipsCard);
+        }
+
+        // Initialize with laptop sources
+        displayDefaultSources();
+
+        // Allow Enter key to search
+        document.getElementById('modelInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchSchematics();
+            }
+        });
+
+        // Add some common device examples
+        document.getElementById('modelInput').addEventListener('focus', function() {
+            const examples = {
+                laptop: "Dell Latitude E7440",
+                phone: "iPhone 12 Pro Max", 
+                tv: "Samsung UN55KU6300",
+                audio: "JBL PartyBox 310"
+            };
+            this.placeholder = `Enter device model (e.g., ${examples[currentDeviceType]})`;
+        });
+    </script>
+</body>
+</html>
